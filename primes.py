@@ -52,6 +52,7 @@ def generate(n):
     return __primes
 
 def is_prime(n):
+    # TODO: This can be optimized
     return n in generate(n)
 
 def factorize(n):
@@ -63,12 +64,26 @@ def factorize(n):
     factors = {}
     for i in generate(n):
         # Found all prime factors
-        if n == 1: break
+        if n <= 1: break
         while 0 == n % i:
             if i not in factors: factors[i] = 1
             else: factors[i] += 1
             n /= i
     return factors.items()
+
+def sum_of_divisors(n):
+    # TODO: Merge this and factorize and use __primes?
+    prod = 1
+    for k in xrange(2, int(n**0.5)+1):
+        p = 1
+        while n % k == 0:
+            p = p*k+1
+            n /= k
+        prod *= p
+    if n > 1:
+        prod *= 1+n
+    return prod;
+    
 
 def __len__(self):
     return __LIMIT

@@ -21,43 +21,58 @@ this limit.
 Find the sum of all the positive integers which cannot be written as the sum of
 two abundant numbers.
 
-Answer: ?????
+Answer: 4159710
 """
 
-# 2: 1
-# 4: 1 2
-# 8: 1 2 4
-# 16: 1 2 4 8
+from __future__ import with_statement
 
-# 3: 1
-# 6: 1 2 3
-# 12: 1 2 3 4 6
-# 24: 1 2 3 4 6 8 12
-
+import primes
 
 def divisors(n):
-    """Returns a list of all proper divisors of n (i.e. all but n)"""
-    return [d for d in xrange(1, n/2+1) if 0 == n % d]
+    """Returns a list of all divisors of n"""
+
+    def recurse(d, factors, depth=0):
+        """Compute the products of all combinations of prime factors"""
+        if not factors: return [d]
+        div = []
+        p,e = factors[0]
+        while e >= 0:
+            div += recurse(d * p ** e, factors[1:], depth+1)
+            e -= 1
+        return div
+
+    return recurse(1, primes.factorize(n))
 
 def is_perfect(n):
-    return sum(divisors(n)) == n
+    return sum(divisors(n)) == 2*n and n > 0
 
 def is_abundant(n):
-    return sum(divisors(n)) > n
+    # Sum of divisors algorithm is ~8 sec faster than actually finding divisors
+    return primes.sum_of_divisors(n) > 2*n and n > 0
+    #return sum(divisors(n)) > 2*n and n > 0
 
 def is_defecient(n):
-    return sum(divisors(n)) > n
+    return sum(divisors(n)) < 2*n and n > 0
 
-#Generate list of abundant numbers
-# FIXME: this is very sloooooow
-abundant = [n for n in xrange(1,28124) if is_abundant(n)]
-print abundant
+if __name__ == "__main__":
+    # Actual limit rather than analytical (28123) from problem description
+    # http://en.wikipedia.org/wiki/Abundant_number
+    limit = 20160
+    res = range(limit+1)
 
-inverse = set([a+b for a,b in zip(abundant,abundant) if a+b < 28124])
-print inverse
-print 
-print res = set(range(1,28124)).difference(inverse)
-print 
-print
-print "Answer", len(res)
+    #Init the prime number generator
+    primes.generate(limit)
+
+    #Generate list of abundant numbers
+    abundant = [n for n in res if is_abundant(n)]
+
+    #Filter out the sums
+    #TODO: Make this faster
+    for a in abundant:
+        for b in abundant:
+            if a+b < len(res):
+                res[a+b] = 0
+    
+    #print res
+    print "Answer: ", sum(res)
 
