@@ -8,17 +8,11 @@ import urllib2
 from BeautifulSoup import BeautifulSoup, Comment
 import contextlib
 
-#TODO: Finish this
-tags = {
-    'p': '%s\n\n',
-    'sup': '^%s',
-    'sub': '_%s',
-}
-
-img_txt = { 
+images = { 
     "images/symbol_minus.gif": "-",
     "images/symbol_times.gif": "*",
     "images/symbol_ne.gif": "!=",
+    "images/symbol_lt.gif": "<",
 }
 
 def handle_tag(tag):
@@ -26,35 +20,52 @@ def handle_tag(tag):
         tn = tag.name.lower()
     except AttributeError:
         # Not a tag, just a string 
-        return tag.strip()
+        return tag.strip() and tag or ""
 
-    if tn in ('p', 'b', 'i', 'sup', 'sub', 'div'):
+    # TODO: Figure out what the 'dfn' tag is about (problem 5)
+    #<dfn title="divisible with no remainder">evenly divisible</dfn> 
+
+    # TODO: Handle better problem 6, 9
+    # <p>Some text<br><div align='center'>more stuff</div></p>
+
+    s = ''
+    if tn in ('p', 'b', 'i', 'sup', 'sub', 'div', 'dfn', 'var'):
         if tag.string:
-            s = tag.string.strip()
+            s = tag.string.replace('\n', ' ')
+            #s = tag.string.strip()
         else:
             # Recursively convert the inner tags to ascii
             s = textify(tag)
 
         if tn == 'sup':
-            s = '^' + s
+            # Do 1st instead of 1^st, etc.
+            if tag.string not in ('st', 'nd', 'rd', 'th'):
+                s = '^' + s
         elif tn == 'sub':
             s = '_' + s
         elif tn == 'p':
+            # TODO: Add div and need a way to mark already formatted sections
             if tag.get('style') == 'text-align:center;':
-                # TODO: use format_text + indent
-                s = '    ' + s
+                s = format_text(s, indent=6)
             else:
                 s = format_text(s)
             s += '\n\n'
+        elif tn == 'dfn':
+            s = ' ' + s + ' '
 
     elif tn == 'br':
         s = '\n'
 
-    elif tn == 'img':
-        s = img_txt.get(tag.src, '<IMG %S>' % tag.src)
+    elif tn == 'img': 
+        if tag['src']:
+            if tag['src'] in images:
+                s = images[tag['src']]
+            #TODO: try the 'alt' attribute
+            else:
+                print "Unrecognized image: %s" % tag
 
     else:
-        s = "<WTF tag=%s>" % tn
+        print "Unrecognized tag: %s" % tag
 
     # TODO: a, td, tr, table, blockquote
     return s
@@ -63,23 +74,20 @@ def textify(soup):
     # Remove comments before processing
     return "".join([handle_tag(t) for t in soup.contents if not isinstance(t, Comment)])
 
-def format_text(text, col=80, indent=0, join=True):
-    # TODO: Handle indent and join=False
-    text.replace('\n', ' ')
+def format_text(text, indent=0, col=80):
     lines = [[]]
-    pos = 0
+    pos = indent
 
     for word in [w for w in text.split() if w.strip()]:
         pos += len(word) + 1
         if pos > col+1:
             lines.append([word])
-            pos = len(word) + 1
-            print lines
+            pos = indent + len(word) + 1
         else:
-            #print lines
             lines[-1].append(word)
 
-    return '\n'.join([' '.join(l) for l in lines])
+    return '\n'.join([indent*' ' + ' '.join(l) for l in lines])
+
 
 template = \
 '''#!/usr/bin/env python
@@ -96,21 +104,26 @@ Answer: ?????
 
 def get_problem(num):
     url = "http://projecteuler.net/index.php?section=problems&id=%d" % num
+    name = "p%03d.py" % num
 #    with contextlib.closing(urllib2.urlopen(url)) as page:
     with open("html/p%03d.html" % num) as page:
         soup = BeautifulSoup(page)
 
-    #<div style="color:#666;font-size:80%;">05 October 2001</div><br />
+    #i.e. <div style="color:#666;font-size:80%;">05 October 2001</div>
     date = textify(soup.find('div', style="color:#666;font-size:80%;"))
-
     desc = textify(soup.find('div', 'problem_content')).strip()
 
-    print template % (num, date, desc),
+    # Create a file from the template
+    header = template % (num, date, desc)
+    print header,
+    input = raw_input("Save file as %s? ([y]/n): " % name)
 
+    if input.lower() in ('', 'y', 'yes'):
+        with open(name, 'w') as f:
+            f.write(header)
+        # FIXME: should use os.chmod
+        os.system('chmod +x %s' % name)
 
-    #name = "p%03d.py" % num
-    #with open(name, 'w') as f:
-    #    f.write(template)
 
 if __name__ == "__main__":
     import sys
