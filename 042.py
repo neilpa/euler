@@ -21,6 +21,7 @@ Answer ?????
 
 from __future__ import with_statement
 
+#TODO: push these into a numbers module
 def sum_of_digits(n, base=10):
     """Calculates the sum of digits of n"""
     return sum([int(d) for d in str(n)])
@@ -29,11 +30,15 @@ def sum_of_chars(s):
     """Calculates the sum of chars based on alphabetical position"""
     return sum([ord(c) - ord('a') + 1 for c in s.lower()])
 
-with open('words.txt') as f:
-    words = f.read().replace('"', '').split(',')
+def solve():
+    with open('words.txt') as f:
+        words = f.read().replace('"', '').split(',')
 
-#TODO: Basic framework for generating sequences
-triangles = [n*(n+1)/2 for n in xrange(1,20)]
+    #TODO: Basic framework for generating sequences
+    triangles = [n*(n+1)/2 for n in xrange(1,20)]
 
-print len([w for w in words if sum_of_chars(w) in triangles])
+    return len([w for w in words if sum_of_chars(w) in triangles])
+
+if __name__ == '__main__':
+    print "Answer: ", solve()
 

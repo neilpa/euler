@@ -28,16 +28,17 @@ from __future__ import with_statement
 
 import primes
 
+#TODO: Move these into a divisors module
 def divisors(n):
     """Returns a list of all divisors of n"""
 
-    def recurse(d, factors, depth=0):
+    def recurse(d, factors):
         """Compute the products of all combinations of prime factors"""
         if not factors: return [d]
         div = []
         p,e = factors[0]
         while e >= 0:
-            div += recurse(d * p ** e, factors[1:], depth+1)
+            div += recurse(d * p ** e, factors[1:])
             e -= 1
         return div
 
@@ -54,25 +55,28 @@ def is_abundant(n):
 def is_defecient(n):
     return sum(divisors(n)) < 2*n and n > 0
 
-if __name__ == "__main__":
+#TODO: This isn't completely correct anymore
+def solve():
     # Actual limit rather than analytical (28123) from problem description
     # http://en.wikipedia.org/wiki/Abundant_number
     limit = 20160
     res = range(limit+1)
 
-    #Init the prime number generator
+    # Init the prime number generator
     primes.generate(limit)
 
-    #Generate list of abundant numbers
+    # Generate list of abundant numbers
     abundant = [n for n in res if is_abundant(n)]
 
-    #Filter out the sums
-    #TODO: Make this faster
+    # Filter out the sums
+    # TODO: Make this faster
     for a in abundant:
         for b in abundant:
             if a+b < len(res):
                 res[a+b] = 0
     
-    #print res
-    print "Answer: ", sum(res)
+    return sum(res)
+
+if __name__ == "__main__":
+    print "Answer: ", solve()
 

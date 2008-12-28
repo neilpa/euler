@@ -90,7 +90,7 @@ def format_text(text, indent=0, col=80):
 
 
 template = \
-'''#!/usr/bin/env python
+r'''#!/usr/bin/env python
 """
 Problem %d
 %s
@@ -99,6 +99,12 @@ Problem %d
 
 Answer: ?????
 """
+
+def solve():
+    pass
+
+if __name__ == '__main__':
+    print "Answer: ", solve()
 
 '''
 

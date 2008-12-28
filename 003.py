@@ -10,3 +10,9 @@ What is the largest prime factor of the number 600851475143 ?
 Answer: ?????
 """
 
+def solve():
+    pass
+
+if __name__ == '__main__':
+    print "Answer: ", solve()
+

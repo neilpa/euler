@@ -29,3 +29,9 @@ Find the greatest product of five consecutive digits in the 1000-digit number.
 Answer: ?????
 """
 
+def solve():
+    pass
+
+if __name__ == '__main__':
+    print "Answer: ", solve()
+

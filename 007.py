@@ -11,3 +11,9 @@ What is the 10001st prime number?
 Answer: ?????
 """
 
+def solve():
+    pass
+
+if __name__ == '__main__':
+    print "Answer: ", solve()
+
