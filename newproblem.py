@@ -104,7 +104,7 @@ Answer: ?????
 
 def get_problem(num):
     url = "http://projecteuler.net/index.php?section=problems&id=%d" % num
-    name = "p%03d.py" % num
+    name = "%03d.py" % num
 #    with contextlib.closing(urllib2.urlopen(url)) as page:
     with open("html/p%03d.html" % num) as page:
         soup = BeautifulSoup(page)
