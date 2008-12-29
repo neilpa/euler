@@ -10,9 +10,11 @@ Find the sum of all the primes below two million.
 Answer: ?????
 """
 
-def solve():
-    pass
+import primes
+
+def solve(): 
+    return sum(primes.xprimes(2000000))
 
 if __name__ == '__main__':
-    print "Answer: ", solve()
+    print "Answer:", solve()
 

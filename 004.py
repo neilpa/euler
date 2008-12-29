@@ -11,9 +11,15 @@ Find the largest palindrome made from the product of two 3-digit numbers.
 Answer: ?????
 """
 
+def is_palindrome(n):
+    return str(n) == str(n)[::-1]
+
 def solve():
-    pass
+    for p in [x for x in xrange(999**2, 0, -1) if is_palindrome(x)]:
+        for m in xrange(999,99,-1):
+            if 0 == p%m and 3 == len(str(p/m)):
+                return p
 
 if __name__ == '__main__':
-    print "Answer: ", solve()
+    print "Answer:", solve()
 

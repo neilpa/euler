@@ -43,16 +43,25 @@ def __grow(n):
     # Add the newly found primes to the list
     __primes += [p for p in __sieve[start:] if p] 
 
+# TODO: Should really get rid of this in favor of a generator
 def generate(n):
     """Generate list of primes up to n using the Sieve of Eratosthenes"""
     global __sieve, __primes
 
     # Grow our list of known primes
     if len(__sieve) < n: __grow(n)
-    #return [p for p in __primes if p <= n]
 
+    #return [p for p in __primes if p <= n]
     # TODO: start using bisect
     return __primes
+
+def xprimes(max):
+    """Generator for prime numbers in range start to end"""
+    generate(max)
+    i = 0
+    while i < len(__primes) and __primes[i] < max:
+        yield __primes[i]
+        i += 1
 
 def is_prime(n):
     # TODO: This can be optimized
@@ -120,5 +129,4 @@ if __name__ == "__main__":
     print "Primes through 5", generate(5)
     print "Prime factors of 12", factorize(12)
     print "Primes through 20", generate(20)
-    #print "Lots o' primes", len(generate(__LIMIT))
 

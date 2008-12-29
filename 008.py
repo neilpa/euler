@@ -2,7 +2,7 @@
 """
 Problem 8
 11 January 2002
- 
+
 Find the greatest product of five consecutive digits in the 1000-digit number.
 
 73167176531330624919225119674426574742355349194934
@@ -30,8 +30,10 @@ Answer: ?????
 """
 
 def solve():
-    pass
+    num = __doc__.split('\n\n')[2].replace('\n', '')
+    return max([int(a)*int(b)*int(c)*int(d)*int(e) for a,b,c,d,e in 
+                zip(num[:-4], num[1:-3], num[2:-2], num[3:-1], num[4:])])
 
 if __name__ == '__main__':
-    print "Answer: ", solve()
+    print "Answer:", solve()
 
