@@ -14,9 +14,17 @@ four million.
 Answer: ?????
 """
 
-def solve():
-    pass
+#TODO: Put this in a sequences module
+def fib(max):
+    """Fibonacci sequence generator"""
+    a, b = 1, 2
+    while a <= max:
+        yield a
+        a, b = b, a+b
 
+def solve():
+    return sum([f for f in fib(4000000) if 0 == f % 2])
+ 
 if __name__ == '__main__':
-    print "Answer: ", solve()
+    print "Answer:", solve()
 

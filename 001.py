@@ -12,9 +12,8 @@ Answer: ?????
 """
 
 def solve():
-    pass
-
+    return sum([x for x in xrange(3,1000) if (0 == x % 3) or (0 == x % 5)])
 
 if __name__ == '__main__':
-    solve()
+    print "Answer:", solve()
 

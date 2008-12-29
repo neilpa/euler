@@ -25,6 +25,7 @@ def __grow(n):
     """Grow the list of primes through n"""
     global  __sieve, __primes
 
+    n = min(n, __LIMIT)
     start = len(__sieve)
     __sieve += range(start, n+1)
 
@@ -49,27 +50,38 @@ def generate(n):
     # Grow our list of known primes
     if len(__sieve) < n: __grow(n)
     #return [p for p in __primes if p <= n]
+
+    # TODO: start using bisect
     return __primes
 
 def is_prime(n):
     # TODO: This can be optimized
     return n in generate(n)
 
-def factorize(n):
+def factorize(n, hint=None):
     """Find the prime factors of n"""
-    # n is prime, therefore it's the only prime factor
-    # TODO: is this even necessary?
-    if is_prime(n): return [(n, 1)]
-    # n isn't prime, find it's factors
-    factors = {}
-    for i in generate(n):
+
+    if not hint: hint = n ** 0.5
+
+    factors = []
+    for p in generate(hint):
+
         # Found all prime factors
         if n <= 1: break
-        while 0 == n % i:
-            if i not in factors: factors[i] = 1
-            else: factors[i] += 1
-            n /= i
-    return factors.items()
+
+        # TODO: This seems like a prime candidate for a generator
+        while 0 == n % p:
+            if not factors or factors[-1][0] != p:
+                factors.append([p,1])
+            else:
+                factors[-1][-1] += 1
+            n /= p
+
+    if n > 1:
+        print "Hint was too small, %s likely prime" % n
+        factors += factorize(n, n)
+
+    return factors
 
 def sum_of_divisors(n):
     # TODO: Merge this and factorize and use __primes?
