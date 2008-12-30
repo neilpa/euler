@@ -13,8 +13,12 @@ images = {
     "images/symbol_times.gif": "*",
     "images/symbol_ne.gif": "!=",
     "images/symbol_lt.gif": "<",
+    "images/symbol_le.gif": "<=",
+    "images/symbol_gt.gif": ">",
+    "images/symbol_ge.gif": ">=",
 }
 
+#TODO: clean-up this function
 def handle_tag(tag):
     try:
         tn = tag.name.lower()
@@ -28,11 +32,12 @@ def handle_tag(tag):
     # TODO: Handle better problem 6, 9
     # <p>Some text<br><div align='center'>more stuff</div></p>
 
+    # TODO: formatter stack??
+
     s = ''
-    if tn in ('p', 'b', 'i', 'sup', 'sub', 'div', 'dfn', 'var'):
+    if tn in ('p', 'b', 'i', 'sup', 'sub', 'div', 'dfn', 'var', 'span', 'a', 'blockquote'):
         if tag.string:
             s = tag.string.replace('\n', ' ')
-            #s = tag.string.strip()
         else:
             # Recursively convert the inner tags to ascii
             s = textify(tag)
@@ -43,10 +48,12 @@ def handle_tag(tag):
                 s = '^' + s
         elif tn == 'sub':
             s = '_' + s
-        elif tn == 'p':
-            # TODO: Add div and need a way to mark already formatted sections
-            if tag.get('style') == 'text-align:center;':
-                s = format_text(s, indent=6)
+        elif tn in ('p', 'div', 'blockquote'):
+            # TODO: Need a way to mark sections as already formattted
+            # i.e. <p>some text<br/><div align='center'>centered text</div>end</p>
+            # better idea, change the markup to <p>...</p><div>...</div><p>...</p>
+            if tn == 'blockquote' or 'text-align:center;' in tag.get('style', '').lower():
+                s = format_text(s, indent=8)
             else:
                 s = format_text(s)
             s += '\n\n'
@@ -60,33 +67,38 @@ def handle_tag(tag):
         if tag['src']:
             if tag['src'] in images:
                 s = images[tag['src']]
-            #TODO: try the 'alt' attribute
             else:
                 print "Unrecognized image: %s" % tag
 
     else:
+        # TODO: li, table
+        # TODO: auto-download text files
         print "Unrecognized tag: %s" % tag
 
-    # TODO: a, td, tr, table, blockquote
     return s
 
 def textify(soup):
     # Remove comments before processing
     return "".join([handle_tag(t) for t in soup.contents if not isinstance(t, Comment)])
+    #return [handle_tag(t) for t in soup.contents if not isinstance(t, Comment)]
 
 def format_text(text, indent=0, col=80):
-    lines = [[]]
-    pos = indent
 
-    for word in [w for w in text.split() if w.strip()]:
-        pos += len(word) + 1
-        if pos > col+1:
-            lines.append([word])
-            pos = indent + len(word) + 1
-        else:
-            lines[-1].append(word)
+    def format(text, indent, col): 
+        lines = [[]]
+        pos = indent
 
-    return '\n'.join([indent*' ' + ' '.join(l) for l in lines])
+        for word in [w for w in text.split() if w.strip()]:
+            pos += len(word) + 1
+            if pos > col+1:
+                lines.append([word])
+                pos = indent + len(word) + 1
+            else:
+                lines[-1].append(word)
+
+        return '\n'.join(indent*' ' + ' '.join(l) for l in lines)
+
+    return '\n'.join(format(l, indent, col) for l in text.split('\n') if l.strip())
 
 
 template = \
@@ -113,7 +125,13 @@ def get_problem(num):
     name = "%03d.py" % num
 #    with contextlib.closing(urllib2.urlopen(url)) as page:
     with open("html/p%03d.html" % num) as page:
-        soup = BeautifulSoup(page)
+        html = page.read().replace('&nbsp;', ' ')
+
+    # TODO: regex to remove var, span 
+    for t in ('<b>', '</b>', '<i>', '</i>'):
+        html = html.replace(t, '')
+
+    soup = BeautifulSoup(html)
 
     #i.e. <div style="color:#666;font-size:80%;">05 October 2001</div>
     date = textify(soup.find('div', style="color:#666;font-size:80%;"))
