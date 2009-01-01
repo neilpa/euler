@@ -27,6 +27,8 @@ except ImportError:
                 s = str(n % base) + s
                 n /= base
             return s
+        elif base == 16:
+            return hex(n)
         else:
             raise "Unsupported base"
 

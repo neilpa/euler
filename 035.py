@@ -14,42 +14,35 @@ How many circular primes are there below one million?
 Answer: ?????
 """
 
-from math import sqrt
+import primes
 
-# TODO: Cleanup
+# TODO: Move to the primes module
+def circular(n):
+    """Determine if n is a circular prime"""
+    #if not primes.is_prime(n):
+    #    return False
 
-def primes(max):
-    sieve = range(max+1)
-    for i in xrange(2, int(sqrt(max))+1):
-        if not sieve[i]: continue
-        for j in xrange(i*i, max+1, i):
-            sieve[j] = None
-    #return [p for p in sieve]
-    return sieve
+    digits = [d for d in str(n)]
 
-def rot(n):
-    s = str(n)
-    for i in xrange(len(s)):
-        r = s[1:] + s[0]
-        #if r == s: break
-        yield int(r)
+    # Skip any numbers with even digits
+    if '2' in digits or '4' in digits or '5' in digits or '6' in digits or '8' in digits:
+        if n == 2 or n == 5: return True
+        else: return False
+
+    rot = digits[1:] + [digits[0]]
+    while rot != digits:
+        if not primes.is_prime(int("".join(rot))):
+            return False
+        rot = rot[1:] + [rot[0]]
+
+    return True
+
+def gen_circular_primes(limit):
+    return [p for p in primes.xprimes(limit) if circular(p)]
 
 def solve():
-    sieve = primes(1000000)
-    circ = []
-
-    for p in [n for n in sieve if n]:
-        gen = rot(p)
-        for r in gen:
-            if not sieve[r]:
-                sieve[p] = None
-
-        if sieve[p]: circ.append(p)
-
-    #print circ[::-1]
-    #print len(circ)
-    return len(circ)
+    return len(gen_circular_primes(1000000))
 
 if __name__ == '__main__':
-    print "Answer:", solve()
+    print "Answer: %s" % solve()
 
