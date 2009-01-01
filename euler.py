@@ -7,7 +7,7 @@ def solve(num):
     try:
         problem = __import__("%03d" % num)
         answer = problem.solve()
-        if not answer:
+        if answer is None:
             print "Problem %d not solved yet" % num
         else:
             print "Answer to problem %d: %s" % (num, answer)

@@ -10,10 +10,10 @@ What is the largest prime factor of the number 600851475143 ?
 Answer: ?????
 """
 
-import primes
+import divisor
 
 def solve():
-    return primes.factorize(600851475143, 50000)[-1][0]
+    return divisor.prime_factors(600851475143, 50000)[-1][0]
 
 if __name__ == '__main__':
     print "Answer:", solve()

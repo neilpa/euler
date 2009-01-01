@@ -16,6 +16,7 @@ images = {
     "images/symbol_le.gif": "<=",
     "images/symbol_gt.gif": ">",
     "images/symbol_ge.gif": ">=",
+    "images/symbol_maps.gif": " --> ",
 }
 
 #TODO: clean-up this function
@@ -116,7 +117,7 @@ def solve():
     pass
 
 if __name__ == '__main__':
-    print "Answer:", solve()
+    print "Answer: %%s" %% solve()
 
 '''
 
@@ -125,7 +126,8 @@ def get_problem(num):
     name = "%03d.py" % num
 #    with contextlib.closing(urllib2.urlopen(url)) as page:
     with open("html/p%03d.html" % num) as page:
-        html = page.read().replace('&nbsp;', ' ')
+        # TODO: another replace dict
+        html = page.read().replace('&nbsp;', ' ').replace('&sup2;', '^2')
 
     # TODO: regex to remove var, span 
     for t in ('<b>', '</b>', '<i>', '</i>'):
@@ -140,13 +142,14 @@ def get_problem(num):
     # Create a file from the template
     header = template % (num, date, desc)
     print header,
-    input = raw_input("Save file as %s? ([y]/n): " % name)
-
-    if input.lower() in ('', 'y', 'yes'):
-        with open(name, 'w') as f:
-            f.write(header)
-        # FIXME: should use os.chmod
-        os.system('chmod +x %s' % name)
+    
+    if raw_input("Save file as %s? ([y]/n): " % name).lower() in ('', 'y'):
+        if not os.path.isfile(name) or raw_input("File exists, are you sure (y/[n])?").lower() == 'y':
+            with open(name, 'w') as f:
+                f.write(header)
+            # FIXME: should use os.chmod
+            os.system('chmod +x %s' % name)
+            print "Created file %s" % name
 
 
 if __name__ == "__main__":

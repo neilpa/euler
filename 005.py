@@ -12,27 +12,13 @@ What is the smallest number that is evenly divisible by all of the numbers from
 Answer: ?????
 """
 
-# TODO: move to a common module
-def gcd(a,b):
-    """Find greatest common divisor with Euclid's Algorithm"""
-    while b: a, b = b, a % b
-    return a
-
-def lcm(a,b):
-    """Calculate lowest common multiple"""
-    return (a*b) / gcd(a,b)
-
-def GCD(terms):
-    return reduce(lambda a,b: gcd(a,b), terms)
-
-def LCM(terms):
-    return reduce(lambda a,b: lcm(a,b), terms)
+import divisor
 
 def solve():
     # Can be easily solved with pen+paper
     # product of primes * multiples of primes for rest
     # 2*3*5*7*11*13*17*19 * 2*2*2 * 3
-    return LCM(range(1,21))
+    return divisor.LCM(range(1,21))
 
 if __name__ == '__main__':
     print "Answer: ", solve()

@@ -21,39 +21,12 @@ this limit.
 Find the sum of all the positive integers which cannot be written as the sum of
 two abundant numbers.
 
-Answer: 4159710
+Answer: ?????
 """
 
 from __future__ import with_statement
 
-import primes
-
-#TODO: Move these into a divisors module
-def divisors(n):
-    """Returns a list of all divisors of n"""
-
-    def recurse(d, factors):
-        """Compute the products of all combinations of prime factors"""
-        if not factors: return [d]
-        div = []
-        p,e = factors[0]
-        while e >= 0:
-            div += recurse(d * p ** e, factors[1:])
-            e -= 1
-        return div
-
-    return recurse(1, primes.factorize(n))
-
-def is_perfect(n):
-    return sum(divisors(n)) == 2*n and n > 0
-
-def is_abundant(n):
-    # Sum of divisors algorithm is ~8 sec faster than actually finding divisors
-    return primes.sum_of_divisors(n) > 2*n and n > 0
-    #return sum(divisors(n)) > 2*n and n > 0
-
-def is_defecient(n):
-    return sum(divisors(n)) < 2*n and n > 0
+from divisor import is_abundant
 
 #TODO: This isn't completely correct anymore
 def solve():
@@ -61,9 +34,6 @@ def solve():
     # http://en.wikipedia.org/wiki/Abundant_number
     limit = 20160
     res = range(limit+1)
-
-    # Init the prime number generator
-    primes.generate(limit)
 
     # Generate list of abundant numbers
     abundant = [n for n in res if is_abundant(n)]

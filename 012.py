@@ -26,13 +26,8 @@ divisors?
 
 Answer: ?????
 """
-import primes
 
-def prod(terms):
-    return reduce(lambda a,b: a*b, terms)
-
-def divisor_count(n):
-    return prod(e+1 for p,e in primes.factorize(n))
+import divisor
 
 def triangle():
     i,t = 1,1
@@ -43,11 +38,12 @@ def triangle():
 
 def solve():
     for t in triangle():
-        # TODO: Fix primes.factorize for 1
-        if t > 1 and divisor_count(t) > 500:
-            #p23 = __import__('023')
-            #print p23.divisors(t)
-            return t
+        if divisor.count(t) > 500:
+            res = t
+            break
+            #return t
+    print res
+    return res
 
 if __name__ == '__main__':
     print "Answer:", solve()

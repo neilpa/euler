@@ -3,14 +3,15 @@
 
 #TODO:
 #better naming schemes 
-#memory growth pattern
-#binary search
 #wrapper class for __sieve and __primes
 #different algo for larger primes
 #couple of unit tests
-#change factorize to not use a dict
 #throw away sieve when done with it??
-#initialization routine
+#replace primes.generate with an actual generator
+#indexable primes
+#provide a start for the list functions
+
+from bisect import bisect
 
 # Start to hit issues once sieve grows beyond several million
 __LIMIT = int(3e7)
@@ -21,90 +22,69 @@ __primes = [2]
 # __sieve[i] == i if i is prime, else 0
 __sieve = [0, 0, 2]
 
+def ensure_primes(f):
+    """Ensure __primes is large enough"""
+    def _f(n):
+        # Grow our list of known primes
+        if len(__sieve) <= n: __grow(n)
+        return f(n)
+    return _f
+
 def __grow(n):
     """Grow the list of primes through n"""
     global  __sieve, __primes
 
-    n = min(n, __LIMIT)
+    if n < 200:
+        end = n**2
+    else:
+        end = n*2
+
+    end = min(end, __LIMIT)
+
+    #TODO: Get rid of most +1's?
     start = len(__sieve)
-    __sieve += range(start, n+1)
+    __sieve += range(start, end+1)
 
     # Eliminate multiples of already known primes
     for p in __primes:
         m = start - start % p # Last multiple of p <= start
-        __sieve[m: n+1: p] = [0] * ((n-m)/p + 1)
+        __sieve[m: end+1: p] = [0] * ((end-m)/p + 1)
 
     # Enumerate remaining numbers looking for primes
-    for i in xrange(start, int(n**0.5) + 1):
+    for i in xrange(start, int(end**0.5) + 1):
         if __sieve[i]:
             # Found another prime, eliminate it's multiples
-            __sieve[i*i: n+1: i] = [0] * (n/i - i + 1)
+            __sieve[i*i: end+1: i] = [0] * (end/i - i + 1)
     
     # Add the newly found primes to the list
     __primes += [p for p in __sieve[start:] if p] 
 
-# TODO: Should really get rid of this in favor of a generator
+@ensure_primes
 def generate(n):
-    """Generate list of primes up to n using the Sieve of Eratosthenes"""
-    global __sieve, __primes
+    """Return a list of primes up to n using the Sieve of Eratosthenes"""
+    return __primes[:bisect(__primes, n)]
 
-    # Grow our list of known primes
-    if len(__sieve) < n: __grow(n)
-
-    #return [p for p in __primes if p <= n]
-    # TODO: start using bisect
-    return __primes
-
-def xprimes(max):
-    """Generator for prime numbers in range start to end"""
-    generate(max)
+@ensure_primes
+def xprimes(n):
+    """Generator for prime numbers up to n"""
     i = 0
-    while i < len(__primes) and __primes[i] < max:
+    while i < len(__primes) and __primes[i] <= n:
         yield __primes[i]
         i += 1
 
+def lazy(n):
+    """Lazily generate primes through n"""
+
+    @ensure_primes 
+    def _lazy(n):
+        pass
+
+    #TODO: figure this out
+
+
+@ensure_primes
 def is_prime(n):
-    # TODO: This can be optimized
-    return n in generate(n)
-
-def factorize(n, hint=None):
-    """Find the prime factors of n"""
-
-    if not hint: hint = n ** 0.5
-
-    factors = []
-    for p in generate(hint):
-
-        # Found all prime factors
-        if n <= 1: break
-
-        # TODO: This seems like a prime candidate for a generator
-        while 0 == n % p:
-            if not factors or factors[-1][0] != p:
-                factors.append([p,1])
-            else:
-                factors[-1][-1] += 1
-            n /= p
-
-    if n > 1:
-        print "Hint was too small, %s likely prime" % n
-        factors += factorize(n, n)
-
-    return factors
-
-def sum_of_divisors(n):
-    # TODO: Merge this and factorize and use __primes?
-    prod = 1
-    for k in xrange(2, int(n**0.5)+1):
-        p = 1
-        while n % k == 0:
-            p = p*k+1
-            n /= k
-        prod *= p
-    if n > 1:
-        prod *= 1+n
-    return prod;
-    
+    return n == __primes[bisect(__primes, n) - 1]
 
 def __len__(self):
     return __LIMIT
@@ -126,7 +106,6 @@ def __contains__(self, item):
     return is_prime(n)
 
 if __name__ == "__main__":
-    print "Primes through 5", generate(5)
-    print "Prime factors of 12", factorize(12)
-    print "Primes through 20", generate(20)
+    #TODO: Some tests
+    pass
 
