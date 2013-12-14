@@ -9,14 +9,12 @@
 -- By considering the terms in the Fibonacci sequence whose values do not exceed four million,
 -- find the sum of the even-valued terms.
 
--- Lamely
+-- Normal recursive lame-ness and slow
 -- fib 0 = 0
 -- fib 1 = 1
 -- fib n = fib(n-1) + fib(n-2)
 
 fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+limit = 4 * 10^6
 
-evenFibs = [ x | x <- fibs, even x ]
-
-p2 = sum (takeWhile valid evenFibs)
-    where valid n = n < 4000000
+p2 = sum (filter even (takeWhile (<limit) fibs))
