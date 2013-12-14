@@ -6,6 +6,9 @@
 --
 -- Find the sum of all the multiples of 3 or 5 below 1000.
 
--- Noob learning Haskell
-p1 = sum [ x | x <- [0..999], x `mod` 3 == 0 || x `mod` 5 == 0 ]
+limit = 999
+xs = [0..limit]
+
+-- List comprehension
+p1 = sum [ x | x <- xs, x `mod` 3 == 0 || x `mod` 5 == 0 ]
 
