@@ -18,25 +18,51 @@
 --
 -- NOTE: Once the chain starts the terms are allowed to go above one million.
 
-import Data.HashMap.Strict as HM
+--import Data.HashMap.Strict as HM
+--import Data.Maybe
 
-collatz :: Int -> [Int]
-collatz 1 = [1]
-collatz 2 = [2,1]
-collatz n
-    | even n = n : (collatz $ n `div` 2)
-    | odd n = n : (collatz $ 3 * n + 1)
 
-chain :: Int -> [(Int, Int)]
-chain n = scanr (\x acc -> (x, snd acc + 1)) (1, 1) (init $ collatz n)
 
-f hm n
-    | HM.lookup n hm /= Nothing = hm
-    | otherwise = HM.union hm $ HM.fromList $ chain n
+--collatz :: Int -> [Int]
+--collatz 1 = [1]
+--collatz 2 = [2,1]
+--collatz n
+--    | even n = n : (collatz $ n `div` 2)
+--    | odd n = n : (collatz $ 3 * n + 1)
 
-chains = foldl f HM.empty [999999,999998..0]
-maxChain k v a = if v > snd a then (k, v) else a
-p14 = HM.foldrWithKey maxChain (0, 0) chains
+--collatz :: Int -> Int
+--collatz 0 = 0
+--collatz 1 = 0
+--collatz n
+--    | even n = n `div` 2
+--    | odd n = 3 * n + 1
+--
+--collatzLength :: Int -> Int
+--collatzLength = (map chain [0..] !!)
+--    where chain 0 = 0
+--          chain 1 = 1
+--          chain n = 1 + collatzLength (collatz n)
+--            | even n = 1 + collatzLength (n `div` 2)
+--            | odd n = 1 + collatzLength (3 * n + 1)
+
+
+--chain :: Int -> [(Int, Int)]
+--chain n = scanr (\x acc -> (x, snd acc + 1)) (1, 1) (init $ collatz n)
+--
+--
+--collatzLength hm 1 = 1
+--collatzLength hm n
+--    | value /= Nothing = fromJust value
+--    | otherwise = collatzLength hm (head $ tail $ collatz n)
+--    where value = HM.lookup n hm
+--
+--f hm n
+--    | HM.lookup n hm /= Nothing = hm
+--    | otherwise = HM.union hm $ HM.fromList $ chain n
+--
+--chains = foldl f HM.empty [999999,999998..0]
+--maxChain k v a = if v > snd a then (k, v) else a
+--p14 = HM.foldrWithKey maxChain (0, 0) chains
 
 --main = putStrLn (show p14)
 
